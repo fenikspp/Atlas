@@ -74,6 +74,9 @@
                 </b-button>
             </template>
         </b-table>
+        <div class="md-layout-item md-small-size-100 md-size-100 mt-4">
+            <b-pagination size="md" v-model="page" :total-rows="count" :per-page="limit"></b-pagination>
+        </div>
     </div>
 </template>
 
@@ -89,6 +92,9 @@ export default {
             teams: [],
             employees: [],
             showDialog: false,
+            page: 1,
+            limit: 0,
+            count: 0,
             fields: [
                 { key: 'idemployees', label: 'Código', sortable: true },
                 { key: 'name', label: 'Nome', sortable: true},
@@ -118,14 +124,16 @@ export default {
                     this.$toasted.global.defaultSuccess()
                     this.showDialog = false
                     this.employee = {}
-                    location.reload();
+                    location.reload()
                 })
                 .catch(showError)
         },
         loadEmployees() {
-            const url = `${baseApiUrl}/employees`
+            const url = `${baseApiUrl}/employees/?page=${this.page}`
             axios.get(url).then(res => {
-                this.employees = res.data
+                this.employees = res.data.data
+                this.count = res.data.count
+                this.limit = res.data.limit
             })
         },
         loadEmployee(employee) {
@@ -141,6 +149,11 @@ export default {
             axios.get(url).then(res => {
                 this.teams = res.data
             })
+        }
+    },
+    watch: {
+        page() {
+            this.loadEmployees()
         }
     },
     mounted() {

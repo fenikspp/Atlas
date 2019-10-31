@@ -7,12 +7,6 @@
                         <b-tab title="Vendas" active>
                             <Processing />
                         </b-tab>
-                        <b-tab title="Teste">
-                           
-                        </b-tab>
-                        <b-tab title="Usuários">
-                            <UserAdmin />
-                        </b-tab>
                     </b-tabs>
                 </b-card>
             </md-card-content>

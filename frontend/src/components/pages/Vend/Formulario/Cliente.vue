@@ -10,7 +10,9 @@
                     <div class="md-layout-item md-small-size-100 md-size-100">
                         <md-radio v-model="client_type" :value="false" class="md-primary" >Pessoa Física</md-radio>
                         <md-radio v-model="client_type" :value="true" class="md-primary">Pessoa Jurídica</md-radio>
-                        <md-input type="hidden" v-model="sales_for_now.id_vendedor"></md-input>
+                        <md-field hidden>
+                            <md-input v-model="sales_for_now.id_vendedor"></md-input>
+                        </md-field>
                     </div>
                     <div class="md-layout-item md-small-size-100 md-size-50">
                         <md-field>
@@ -290,7 +292,6 @@
                 <md-button @click="saveSale()" class="md-info">Criar Venda</md-button>
             </md-card-actions>
         </md-card>
-
     </form>
 </template>
 
@@ -366,6 +367,7 @@ export default {
         },
         saveSale() {
             this.sending = true
+            this.sales_for_now.status = 'Enviado'
             this.sales_for_now.id_vendedor = parseInt(this.$store.state.employeer.id)
             axios.post(`${baseApiUrl}/sales`, this.sales_for_now)
                 .then(() => {

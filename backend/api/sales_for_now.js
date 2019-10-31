@@ -1,5 +1,5 @@
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError } = app.api.validation
+    const { existsOrError, notExistsOrError, equalsOrError, notEqualsOrError } = app.api.validation
 
     const save = async (req, res) => {
         const sale = { ...req.body }
@@ -20,6 +20,7 @@ module.exports = app => {
                 if (!sale.voz && !sale.dados && !sale.tv && !sale.controle) {
                     existsOrError(sale.dados, 'Nenhum produto foi informado!')
                 }
+                notEqualsOrError(sale.status, 'Tratamento', 'Altere o status da venda!')
                 
                 const saleFromDB = await app.db('atlas.sale_for_now')
                     .where({ cnpj: sale.cnpj }).first()
@@ -45,6 +46,8 @@ module.exports = app => {
                 if (!sale.voz && !sale.dados && !sale.tv && !sale.controle) {
                     existsOrError(sale.dados, 'Nenhum produto foi informado!')
                 }
+
+                notEqualsOrError(sale.status, 'Tratamento', 'Altere o status da venda!')
                 
                 const saleFromDB = await app.db('atlas.sale_for_now')
                     .where({ cpf: sale.cpf }).first()
@@ -60,7 +63,7 @@ module.exports = app => {
         if(sale.id) {
             app.db('atlas.sale_for_now')
                 .update(sale)
-                .where({ id : sale.id })
+                .where({ id:sale.id })
                 .then(_ => res.status(204).send())
                 .catch(err => res.status(500).send(err))
         } else {
@@ -72,12 +75,20 @@ module.exports = app => {
 
     }
 
-    const get = (req, res) => {
+    const limit = 10 // usado para paginação !!
+
+    const get = async (req, res) => {
+        const page = req.query.page || 1
+
+        const result = await app.db('atlas.sale_for_now')
+            .count('sale_for_now.id').first()
+        const count = parseInt(result.count)
+
         app.db('atlas.sale_for_now')
             .select('sale_for_now.id as codigo', 'sale_for_now.status','sale_for_now.name as cliente',
                 'sale_for_now.cpf', 'sale_for_now.cnpj','sale_for_now.gender','sale_for_now.email',
-                'sale_for_now.mother_name','sale_for_now.ddd','sale_for_now.birthday','employees.name as vendedor',
-                'sale_for_now.number_res','sale_for_now.number_cel','sale_for_now.number_com', 'sale_for_now.uf',
+                'sale_for_now.mother_name','sale_for_now.ddd','sale_for_now.birthday','employees.name as nomeVendedor',
+                'sale_for_now.number_res','sale_for_now.number_cel','sale_for_now.number_com', 'sale_for_now.uf', 'employees.idemployees as vendedor',
                 'sale_for_now.municipio', 'sale_for_now.cidade','sale_for_now.bairro','teams.name as team',
                 'sale_for_now.quadra','sale_for_now.numero_quadra', 'sale_for_now.chacara', 'sale_for_now.numero_chacara',
                 'sale_for_now.conjunto', 'sale_for_now.numero_conjunto', 'sale_for_now.casa', 'sale_for_now.complemento',
@@ -91,17 +102,27 @@ module.exports = app => {
             .leftJoin('atlas.products as c', 'sale_for_now.controle', 'c.produtos')
             .leftJoin('atlas.employees', 'sale_for_now.id_vendedor', 'employees.idemployees')
             .leftJoin('atlas.teams', 'teams.idTeam', 'employees.team')
-            .then(users => res.json(users))
+            //.whereNot({ status: "Tratamento" })
+            .limit(limit).offset(page * limit - limit)
+            .orderBy('sale_for_now.id')
+            .then(sale => res.json({ data: sale, count, limit }))
             .catch(err => res.status(500).send(err))
     }
 
-    const getById = (req, res) => {
-        app.db('atlas.sale_for_now')
+    const getById = async (req, res) => {
+        function alteraStatus (sale) {
+            app.db('atlas.sale_for_now')
+                .update({ status: 'Tratamento' })
+                .where({ id: sale.codigo })
+                .then()
+        }
+
+        await app.db('atlas.sale_for_now')
             .select('sale_for_now.id as codigo', 'sale_for_now.status','sale_for_now.name as cliente',
                 'sale_for_now.cpf', 'sale_for_now.cnpj','sale_for_now.gender','sale_for_now.email',
-                'sale_for_now.mother_name','sale_for_now.ddd','sale_for_now.birthday','employees.name as vendedor',
+                'sale_for_now.mother_name','sale_for_now.ddd','sale_for_now.birthday','employees.name as nomeVendedor',
                 'sale_for_now.number_res','sale_for_now.number_cel','sale_for_now.number_com', 'sale_for_now.uf',
-                'sale_for_now.municipio', 'sale_for_now.cidade','sale_for_now.bairro','teams.name as team',
+                'sale_for_now.municipio', 'sale_for_now.cidade','sale_for_now.bairro','teams.name as team', 'employees.idemployees as vendedor',
                 'sale_for_now.quadra','sale_for_now.numero_quadra', 'sale_for_now.chacara', 'sale_for_now.numero_chacara',
                 'sale_for_now.conjunto', 'sale_for_now.numero_conjunto', 'sale_for_now.casa', 'sale_for_now.complemento',
                 'sale_for_now.cep', 'sale_for_now.logradouro', 'v.produtos as voz', 'v.pontos as voz_pontos', 'd.produtos as dados',
@@ -115,9 +136,11 @@ module.exports = app => {
             .leftJoin('atlas.employees', 'sale_for_now.id_vendedor', 'employees.idemployees')
             .leftJoin('atlas.teams', 'teams.idTeam', 'employees.team')
             .where({ id: req.params.id })
+            .whereNot({ status: "Tratamento" })
             .first()
             .then(sale => {
                 sale.content = sale.content.toString()
+                alteraStatus(sale)
                 return res.json(sale)
             })
             .catch(err => res.status(500).send(err))

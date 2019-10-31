@@ -541,7 +541,6 @@ module.exports = app => {
     const salecart = (res, sale) => {
         sale.products = app.db('atlas.sales').select('*')
         return sale
-
     }
 
     const get = async (req, res) => {

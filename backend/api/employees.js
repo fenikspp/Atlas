@@ -51,18 +51,21 @@ module.exports = app => {
         
     }
 
+    const limit = 10 // usado para paginação !!
+
     const get = async (req, res) => {
+        const page = req.query.page || 1
+
+        const result = await app.db('atlas.employees')
+            .count('employees.idemployees').first()
+        const count = parseInt(result.count)
+
         app.db('atlas.employees')
             .select('employees.idemployees', 'employees.name', 'employees.userName', 'employees.type', 'teams.name as team')
             .leftJoin('atlas.teams', 'teams.idTeam', 'employees.team')
-            .then(employees => res.json(employees))
-            .catch(err => res.status(500).send(err))
-    }
-
-    const getAll = async(req, res) => {
-        app.db('atlas.employees')
-            .select('name', 'idemployees')
-            .then(employees => res.json(employees))
+            .limit(limit).offset(page * limit - limit)
+            .orderBy('employees.idemployees')
+            .then(employees => res.json({ data: employees, count, limit }))
             .catch(err => res.status(500).send(err))
     }
 
@@ -72,6 +75,14 @@ module.exports = app => {
             .where({ idemployees: req.params.id })
             .whereNull('deleted_at')
             .first()
+            .then(employeer => res.json(employeer))
+            .catch(err => res.status(500).send(err))
+    }
+
+    const getAll = (req, res) => {
+        app.db('atlas.employees')
+            .select('idemployees', 'name', 'userName', 'type')
+            .whereNull('deleted_at')
             .then(employeer => res.json(employeer))
             .catch(err => res.status(500).send(err))
     }
@@ -93,6 +104,6 @@ module.exports = app => {
         }
     }
 
-    return { save, get, getAll, getById, remove }
+    return { save, get, getById, remove, getAll }
 
 }

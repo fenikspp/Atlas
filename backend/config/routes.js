@@ -17,10 +17,10 @@ module.exports = app => {
     app.route('/employees/:id')
         .put(app.api.employees.save)
         .get(app.api.employees.getById)
-    
-    app.route('/employees_all')
-        .get(app.api.employees.getAll)
 
+    app.route('/employeesall')
+        .get(app.api.employees.getAll)
+    
     app.route('/users/:id')
         .put(app.api.user.save)
         .get(app.api.user.getById)
@@ -71,9 +71,13 @@ module.exports = app => {
 
     app.route('/saleprocessing/:id')
         .get(app.api.sales_for_now.getById)
+        .put(app.api.sales_for_now.save)
     // Sales Teste 
     app.route('/newsale')
         .post(app.api.sales.save)
         .get(app.api.sales.get)
+
+    app.route('/statstest')
+        .get(app.api.stats.salesPerMonth)
     
 }

@@ -5,6 +5,14 @@ module.exports = app => {
         if(typeof value === 'string' && !value.trim()) throw msg
     }
 
+    function minC(value, msg) {
+        if (value.length < 1 ) throw msg
+    }
+
+    function maxC(value, msg) {
+        if (value.length > 2 ) throw msg
+    }
+
     function notExistsOrError(value, msg) {
         try {
             existsOrError(value, msg)
@@ -18,5 +26,9 @@ module.exports = app => {
         if(valueA !== valueB) throw msg
     }
 
-    return { existsOrError, notExistsOrError, equalsOrError }
+    function notEqualsOrError(valueA, ValueB, msg) {
+        if (valueA == ValueB) throw msg 
+    }
+
+    return { existsOrError, notExistsOrError, equalsOrError, notEqualsOrError }
 }

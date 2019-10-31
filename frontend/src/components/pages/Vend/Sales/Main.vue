@@ -7,12 +7,6 @@
                         <b-tab title="Enviadas" active>
                             <allsales />
                         </b-tab>
-                        <b-tab title="Concluida">
-                            <CategoryAdmin />
-                        </b-tab>
-                        <b-tab title="Canceladas">
-                            <UserAdmin />
-                        </b-tab>
                     </b-tabs>
                 </b-card>
             </md-card-content>

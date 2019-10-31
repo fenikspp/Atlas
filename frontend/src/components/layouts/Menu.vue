@@ -1,12 +1,6 @@
 <template>
     <ul class="nav nav-mobile-menu">
         <li>
-            <md-field>
-                <label>Search</label>
-                <md-input v-model="search" type="text"></md-input>
-            </md-field>
-        </li>
-        <li>
             <drop-down>
                 <a slot="title" class="dropdown-toggle" data-toggle="dropdown">
                     <i class="material-icons">perm_identity</i>

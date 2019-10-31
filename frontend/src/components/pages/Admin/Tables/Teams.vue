@@ -94,9 +94,9 @@ export default {
             this.team = {}
         },
         getSupervisor() {
-            const url = `${baseApiUrl}/employees_all`
+            const url = `${baseApiUrl}/employees`
                 axios.get(url).then(res => {
-                    this.supervisor = res.data
+                    this.supervisor = res.data.data
                 })
         }
     },

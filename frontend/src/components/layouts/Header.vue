@@ -15,13 +15,6 @@
                 </md-button>
 
                 <div class="md-collapse">
-                    <div class="md-autocomplete">
-                        <md-autocomplete
-                            class="search"
-                        >
-                            <label>Search...</label>
-                        </md-autocomplete>
-                    </div>
                     <md-list>
                         <md-list-item href="#/">
                             <i class="material-icons">dashboard</i>

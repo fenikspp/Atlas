@@ -1,9 +1,7 @@
 import Vue from 'vue'
 
-import { port, address } from '../../../../.env'
-
 export const employeerKey = '__Webmax_user'
-export const baseApiUrl = `http://${address}:${port}`
+export const baseApiUrl = `https://atlas.grupowebmax.com`
 
 export function showError(e) {
     if(e && e.response && e.response.data) {

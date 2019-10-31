@@ -1,4 +1,4 @@
-const { authSecret } = require('../../.env')
+const { authSecret } = require('../.env')
 const jwt = require('jwt-simple')
 const bcrypt = require('bcrypt-nodejs')
 
@@ -25,6 +25,7 @@ module.exports = app => {
             userName: employeer.userName,
             email: employeer.email,
             type: employeer.type,
+            updated: employeer.updated_at,
             iat: now,
             exp: now + (60 * 60 * 24 * 3)
         }

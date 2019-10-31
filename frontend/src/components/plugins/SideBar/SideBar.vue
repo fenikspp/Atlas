@@ -2,11 +2,11 @@
     <div class="sidebar" :data-color="activeColor" :data-image="backgroundImage" :style="sidebarStyle">
         <div class="logo">
             <router-link to="/userprofile" class="simple-text logo-mini">
-                <md-ava>
+                <md-avatar>
                     <Icon />
-                </md-ava>
+                </md-avatar>
             </router-link>
-            <a href="/userprofile" class="router-link simple-text logo-normal">
+            <a href="/#/userprofile" class="router-link simple-text logo-normal">
                 <Title />
             </a>
         </div>
